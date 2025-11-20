@@ -1,0 +1,1045 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>主题库 - 玻璃态设计</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+        }
+
+        :root {
+            --primary-color: #4FC3F7;
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --g3-radius: 48px;
+            --shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            --transition: all 0.3s ease;
+        }
+
+        body {
+            background: linear-gradient(135deg, #2D2B4E 0%, #1E1D3A 50%, #151429 100%);
+            color: white;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .app-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* 玻璃态效果基础类 */
+        .glass {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            box-shadow: var(--shadow);
+        }
+
+        .glass-strong {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+        }
+
+        .glass-light {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+        }
+
+        /* 主内容区域 */
+        .main-content {
+            margin-bottom: 100px;
+        }
+
+        /* 主题卡片 */
+        .theme-card {
+            border-radius: var(--g3-radius);
+            padding: 30px;
+            margin: 20px 0;
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .theme-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        .theme-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .theme-title {
+            font-size: 24px;
+            font-weight: bold;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .theme-version {
+            font-size: 16px;
+            color: #CCCCCC;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+        }
+
+        .theme-author {
+            font-size: 16px;
+            color: #AAAAAA;
+            margin-bottom: 8px;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+        }
+
+        .theme-style {
+            font-size: 16px;
+            color: #AAAAAA;
+            margin-bottom: 15px;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+        }
+
+        .theme-action {
+            font-size: 14px;
+            color: var(--primary-color);
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+        }
+
+        /* 底部导航 */
+        .bottom-nav {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: calc(100% - 40px);
+            max-width: 1200px;
+            border-radius: var(--g3-radius);
+            padding: 15px 0;
+            display: flex;
+            justify-content: space-around;
+            z-index: 100;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            transition: var(--transition);
+            padding: 10px 15px;
+            border-radius: 30px;
+            flex: 1;
+            text-align: center;
+        }
+
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-item.active {
+            color: var(--primary-color);
+        }
+
+        .nav-icon {
+            font-size: 20px;
+            margin-bottom: 5px;
+        }
+
+        .nav-text {
+            font-size: 14px;
+        }
+
+        /* 彩蛋触发区域 */
+        .egg-trigger {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            opacity: 0.4;
+            transition: var(--transition);
+        }
+
+        .egg-trigger:hover {
+            opacity: 0.7;
+        }
+
+        /* 彩蛋 */
+        .easter-egg {
+            position: fixed;
+            width: 80px;
+            height: 80px;
+            border-radius: var(--g3-radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            cursor: move;
+            z-index: 1000;
+            user-select: none;
+            transition: transform 0.2s;
+        }
+
+        .easter-egg:active {
+            transform: scale(1.2);
+        }
+
+        /* 弹窗 */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s, visibility 0.3s;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            width: 90%;
+            max-width: 500px;
+            border-radius: var(--g3-radius);
+            padding: 30px;
+            transform: translateY(20px);
+            transition: transform 0.3s;
+        }
+
+        .modal-overlay.active .modal-content {
+            transform: translateY(0);
+        }
+
+        .modal-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-title {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .user-card {
+            border-radius: var(--g3-radius);
+            padding: 20px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+        }
+
+        .user-icon {
+            font-size: 24px;
+            margin-right: 15px;
+        }
+
+        .user-info {
+            flex: 1;
+        }
+
+        .user-name {
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
+
+        .user-level {
+            font-size: 14px;
+            color: #CCCCCC;
+        }
+
+        .option-list {
+            margin-bottom: 25px;
+        }
+
+        .option-item {
+            border-radius: var(--g3-radius);
+            padding: 18px 20px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .option-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateX(5px);
+        }
+
+        .option-icon {
+            font-size: 18px;
+            margin-right: 15px;
+        }
+
+        .option-text {
+            flex: 1;
+        }
+
+        .option-title {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 3px;
+        }
+
+        .option-desc {
+            font-size: 12px;
+            color: #AAAAAA;
+        }
+
+        .modal-actions {
+            display: flex;
+        }
+
+        .modal-btn {
+            flex: 1;
+            text-align: center;
+            padding: 15px;
+            border-radius: var(--g3-radius);
+            cursor: pointer;
+            transition: var(--transition);
+            font-weight: bold;
+        }
+
+        .modal-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .modal-btn.primary {
+            color: var(--primary-color);
+        }
+
+        /* 详情页 */
+        .detail-page {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, #2D2B4E 0%, #1E1D3A 50%, #151429 100%);
+            z-index: 1500;
+            overflow-y: auto;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s, visibility 0.3s;
+        }
+
+        .detail-page.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .detail-header {
+            padding: 40px 30px 20px;
+            display: flex;
+            align-items: center;
+        }
+
+        .back-btn {
+            font-size: 18px;
+            color: var(--primary-color);
+            cursor: pointer;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+        }
+
+        .back-btn::before {
+            content: "←";
+            margin-right: 5px;
+        }
+
+        .detail-content {
+            padding: 0 30px 40px;
+        }
+
+        .carousel {
+            border-radius: var(--g3-radius);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .carousel-title {
+            font-size: 18px;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 15px;
+            text-shadow: 0 2px 3px rgba(0, 0, 0, 0.5);
+        }
+
+        .carousel-container {
+            border-radius: var(--g3-radius);
+            padding: 20px;
+            overflow: hidden;
+        }
+
+        .carousel-scroll {
+            display: flex;
+            overflow-x: auto;
+            padding: 10px 0;
+            scrollbar-width: none;
+        }
+
+        .carousel-scroll::-webkit-scrollbar {
+            display: none;
+        }
+
+        .carousel-item {
+            min-width: 280px;
+            border-radius: var(--g3-radius);
+            padding: 15px;
+            margin-right: 15px;
+        }
+
+        .carousel-item-title {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+        }
+
+        .carousel-image {
+            width: 100%;
+            height: 180px;
+            border-radius: 24px;
+            background: rgba(255, 255, 255, 0.1);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #CCCCCC;
+        }
+
+        .carousel-info {
+            font-size: 12px;
+            color: #CCCCCC;
+        }
+
+        .carousel-hint {
+            text-align: center;
+            margin-top: 15px;
+            font-size: 14px;
+            color: var(--primary-color);
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+        }
+
+        .detail-card {
+            border-radius: var(--g3-radius);
+            padding: 30px;
+            margin-bottom: 20px;
+        }
+
+        .detail-title-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .detail-title {
+            font-size: 24px;
+            font-weight: bold;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .detail-version {
+            font-size: 16px;
+            color: #CCCCCC;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+        }
+
+        .detail-author {
+            font-size: 16px;
+            color: #AAAAAA;
+            margin-bottom: 8px;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+        }
+
+        .detail-style {
+            font-size: 16px;
+            color: #AAAAAA;
+            margin-bottom: 15px;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+        }
+
+        .card-content {
+            font-size: 14px;
+            color: #CCCCCC;
+            line-height: 1.5;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+        }
+
+        .action-btn {
+            border-radius: var(--g3-radius);
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: var(--transition);
+            font-weight: bold;
+        }
+
+        .action-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .action-btn.primary {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .action-btn.secondary {
+            color: var(--primary-color);
+        }
+
+        /* 响应式调整 */
+        @media (max-width: 768px) {
+            :root {
+                --g3-radius: 32px;
+            }
+            
+            .app-container {
+                padding: 15px;
+            }
+            
+            .theme-card {
+                padding: 20px;
+            }
+            
+            .bottom-nav {
+                width: calc(100% - 30px);
+            }
+            
+            .detail-header {
+                padding: 30px 20px 15px;
+            }
+            
+            .detail-content {
+                padding: 0 20px 30px;
+            }
+        }
+
+        /* 粒子效果 */
+        .particle {
+            position: fixed;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: yellow;
+            pointer-events: none;
+            z-index: 1001;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div class="main-content">
+            <!-- 主题卡片 -->
+            <div class="theme-card glass" data-theme="ne">
+                <div class="theme-header">
+                    <div class="theme-title">Ne图标</div>
+                    <div class="theme-version">3.0</div>
+                </div>
+                <div class="theme-author">作者: 山为临川</div>
+                <div class="theme-style">风格: 开端</div>
+                <div class="theme-action">点击打开下载及预览图</div>
+            </div>
+
+            <div class="theme-card glass" data-theme="light">
+                <div class="theme-header">
+                    <div class="theme-title">逐光</div>
+                    <div class="theme-version">2.0</div>
+                </div>
+                <div class="theme-author">作者: 山为临川</div>
+                <div class="theme-style">风格: 锐利</div>
+                <div class="theme-action">点击打开下载及预览图</div>
+            </div>
+
+            <div class="theme-card glass" data-theme="ios">
+                <div class="theme-header">
+                    <div class="theme-title">ios26</div>
+                    <div class="theme-version">2.0 bata</div>
+                </div>
+                <div class="theme-author">作者: 山为临川</div>
+                <div class="theme-style">风格: 默认</div>
+                <div class="theme-action">点击打开下载及预览图</div>
+                <div class="theme-status" style="color: #FF9800; margin-top: 10px; font-size: 12px;">by:山为临川</div>
+            </div>
+
+            <div class="theme-card glass" data-theme="best">
+                <div class="theme-header">
+                    <div class="theme-title">best</div>
+                    <div class="theme-version">bata</div>
+                </div>
+                <div class="theme-author">作者: HarmonyOS</div>
+                <div class="theme-style">风格: 暂未开通</div>
+                <div class="theme-action">点击打开下载及预览图</div>
+            </div>
+        </div>
+
+        <!-- 底部导航 -->
+        <div class="bottom-nav glass">
+            <div class="egg-trigger glass-light" title="彩蛋触发区域">💎</div>
+            <div class="nav-item active">
+                <div class="nav-icon">🏠</div>
+                <div class="nav-text">首页</div>
+            </div>
+            <div class="nav-item">
+                <div class="nav-icon">📂</div>
+                <div class="nav-text">分类</div>
+            </div>
+            <div class="nav-item">
+                <div class="nav-icon">🔍</div>
+                <div class="nav-text">发现</div>
+            </div>
+            <div class="nav-item" id="my-btn">
+                <div class="nav-icon">👤</div>
+                <div class="nav-text">我的</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 彩蛋 -->
+    <div class="easter-egg glass-strong" style="display: none;">✨</div>
+
+    <!-- 弹窗 -->
+    <div class="modal-overlay" id="modal">
+        <div class="modal-content glass-strong">
+            <div class="modal-header">
+                <div class="modal-title">我的信息</div>
+            </div>
+            
+            <div class="user-card glass-light">
+                <div class="user-icon">👤</div>
+                <div class="user-info">
+                    <div class="user-name">用户名: 主题爱好者</div>
+                    <div class="user-level">等级: VIP会员</div>
+                </div>
+            </div>
+            
+            <div class="option-list">
+                <div class="option-item glass-light">
+                    <div class="option-icon">⭐</div>
+                    <div class="option-text">
+                        <div class="option-title">我的收藏</div>
+                        <div class="option-desc">查看已收藏的主题</div>
+                    </div>
+                </div>
+                
+                <div class="option-item glass-light">
+                    <div class="option-icon">📥</div>
+                    <div class="option-text">
+                        <div class="option-title">下载记录</div>
+                        <div class="option-desc">查看下载历史</div>
+                    </div>
+                </div>
+                
+                <div class="option-item glass-light">
+                    <div class="option-icon">⚙️</div>
+                    <div class="option-text">
+                        <div class="option-title">设置</div>
+                        <div class="option-desc">应用设置选项</div>
+                    </div>
+                </div>
+                
+                <div class="option-item glass-light">
+                    <div class="option-icon">❓</div>
+                    <div class="option-text">
+                        <div class="option-title">帮助与反馈</div>
+                        <div class="option-desc">获取帮助信息</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="modal-actions">
+                <div class="modal-btn primary" id="close-modal">关闭</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 详情页 -->
+    <div class="detail-page" id="detail-page">
+        <div class="detail-header">
+            <div class="back-btn" id="back-btn">返回</div>
+        </div>
+        
+        <div class="detail-content">
+            <div class="carousel glass">
+                <div class="carousel-title" id="carousel-title">主题预览 (Ne图标)</div>
+                <div class="carousel-container glass-light">
+                    <div class="carousel-scroll" id="carousel-scroll">
+                        <!-- 轮播项将通过JS动态添加 -->
+                    </div>
+                </div>
+                <div class="carousel-hint">左右滑动查看完整预览图</div>
+            </div>
+            
+            <div class="detail-card glass">
+                <div class="detail-title-section">
+                    <div class="detail-title" id="detail-title">Ne图标</div>
+                    <div class="detail-version" id="detail-version">3.0</div>
+                </div>
+                <div class="detail-author" id="detail-author">作者: 山为临川</div>
+                <div class="detail-style" id="detail-style">风格: 开端</div>
+            </div>
+            
+            <div class="detail-card glass">
+                <div class="card-title">主题介绍</div>
+                <div class="card-content">
+                    这是一个精美的主题，拥有优秀的视觉效果和流畅的交互体验。适合追求美感和实用性的用户。
+                </div>
+            </div>
+            
+            <div class="detail-card glass">
+                <div class="action-btn primary" id="download-btn">立即下载</div>
+                <div class="action-btn secondary" id="preview-btn">预览效果</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 主题数据
+            const themeData = {
+                ne: {
+                    name: "Ne图标",
+                    version: "3.0",
+                    author: "山为临川",
+                    style: "开端",
+                    images: [
+                        { title: "Ne主界面", desc: "ne_main_ui.png" },
+                        { title: "Ne设置页", desc: "ne_settings.png" },
+                        { title: "Ne图标集", desc: "ne_icons.png" },
+                        { title: "Ne锁屏", desc: "ne_lock.png" },
+                        { title: "Ne壁纸", desc: "ne_wallpaper.png" }
+                    ]
+                },
+                light: {
+                    name: "逐光",
+                    version: "2.0",
+                    author: "山为临川",
+                    style: "锐利",
+                    images: [
+                        { title: "逐光主界面", desc: "zg_main_ui.png" },
+                        { title: "逐光设置页", desc: "zg_settings.png" },
+                        { title: "逐光图标", desc: "zg_icons.png" },
+                        { title: "逐光锁屏", desc: "zg_lock.png" },
+                        { title: "逐光特效", desc: "zg_effects.png" }
+                    ]
+                },
+                ios: {
+                    name: "ios26",
+                    version: "2.0 bata",
+                    author: "山为临川",
+                    style: "默认",
+                    images: [
+                        { title: "iOS26主屏", desc: "ios26_main.png" },
+                        { title: "控制中心", desc: "ios26_control.png" },
+                        { title: "iOS图标", desc: "ios26_icons.png" },
+                        { title: "锁屏界面", desc: "ios26_lock.png" },
+                        { title: "通知中心", desc: "ios26_notification.png" }
+                    ]
+                },
+                best: {
+                    name: "best",
+                    version: "bata",
+                    author: "HarmonyOS",
+                    style: "暂未开通",
+                    images: [
+                        { title: "Best主界面", desc: "best_main.png" },
+                        { title: "Best设置", desc: "best_settings.png" },
+                        { title: "Best图标", desc: "best_icons.png" },
+                        { title: "Best锁屏", desc: "best_lock.png" },
+                        { title: "Best主题效果", desc: "best_theme.png" }
+                    ]
+                }
+            };
+
+            // 元素引用
+            const modal = document.getElementById('modal');
+            const myBtn = document.getElementById('my-btn');
+            const closeModal = document.getElementById('close-modal');
+            const themeCards = document.querySelectorAll('.theme-card');
+            const detailPage = document.getElementById('detail-page');
+            const backBtn = document.getElementById('back-btn');
+            const carouselTitle = document.getElementById('carousel-title');
+            const carouselScroll = document.getElementById('carousel-scroll');
+            const detailTitle = document.getElementById('detail-title');
+            const detailVersion = document.getElementById('detail-version');
+            const detailAuthor = document.getElementById('detail-author');
+            const detailStyle = document.getElementById('detail-style');
+            const downloadBtn = document.getElementById('download-btn');
+            const previewBtn = document.getElementById('preview-btn');
+            const eggTrigger = document.querySelector('.egg-trigger');
+            const easterEgg = document.querySelector('.easter-egg');
+            const navItems = document.querySelectorAll('.nav-item');
+
+            // 弹窗控制
+            myBtn.addEventListener('click', function() {
+                modal.classList.add('active');
+            });
+
+            closeModal.addEventListener('click', function() {
+                modal.classList.remove('active');
+            });
+
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) {
+                    modal.classList.remove('active');
+                }
+            });
+
+            // 导航项点击
+            navItems.forEach(item => {
+                if (!item.querySelector('.egg-trigger')) {
+                    item.addEventListener('click', function() {
+                        navItems.forEach(nav => nav.classList.remove('active'));
+                        this.classList.add('active');
+                        
+                        if (this.querySelector('.nav-text').textContent === '我的') {
+                            modal.classList.add('active');
+                        }
+                    });
+                }
+            });
+
+            // 主题卡片点击
+            themeCards.forEach(card => {
+                card.addEventListener('click', function() {
+                    const theme = this.getAttribute('data-theme');
+                    showDetailPage(theme);
+                });
+            });
+
+            // 显示详情页
+            function showDetailPage(theme) {
+                const data = themeData[theme];
+                
+                // 更新详情页内容
+                carouselTitle.textContent = `主题预览 (${data.name})`;
+                detailTitle.textContent = data.name;
+                detailVersion.textContent = data.version;
+                detailAuthor.textContent = `作者: ${data.author}`;
+                detailStyle.textContent = `风格: ${data.style}`;
+                
+                // 更新轮播内容
+                carouselScroll.innerHTML = '';
+                data.images.forEach(item => {
+                    const carouselItem = document.createElement('div');
+                    carouselItem.className = 'carousel-item glass-light';
+                    carouselItem.innerHTML = `
+                        <div class="carousel-item-title">${item.title}</div>
+                        <div class="carousel-image">${item.desc}</div>
+                        <div class="carousel-info">${item.desc}</div>
+                    `;
+                    carouselScroll.appendChild(carouselItem);
+                });
+                
+                // 显示详情页
+                detailPage.classList.add('active');
+            }
+
+            // 返回按钮
+            backBtn.addEventListener('click', function() {
+                detailPage.classList.remove('active');
+            });
+
+            // 详情页按钮
+            downloadBtn.addEventListener('click', function() {
+                alert(`开始下载 ${detailTitle.textContent} 主题`);
+            });
+
+            previewBtn.addEventListener('click', function() {
+                alert(`打开 ${detailTitle.textContent} 预览图`);
+            });
+
+            // 彩蛋功能
+            let isEasterEggActive = false;
+            let lastTapTime = 0;
+
+            eggTrigger.addEventListener('click', function() {
+                if (!isEasterEggActive) {
+                    showEasterEgg();
+                    showMessage("发现彩蛋！拖动星星看看吧 ✨ (双击屏幕关闭)");
+                } else {
+                    showMessage("彩蛋已经激活了！双击屏幕关闭 ✨");
+                }
+            });
+
+            function showEasterEgg() {
+                isEasterEggActive = true;
+                easterEgg.style.display = 'flex';
+                
+                // 初始位置
+                const screenWidth = window.innerWidth;
+                const screenHeight = window.innerHeight;
+                easterEgg.style.left = (screenWidth / 2 - 40) + 'px';
+                easterEgg.style.top = (screenHeight - 300) + 'px';
+                
+                // 拖动功能
+                let isDragging = false;
+                let offsetX, offsetY;
+                
+                easterEgg.addEventListener('mousedown', startDrag);
+                easterEgg.addEventListener('touchstart', startDrag);
+                
+                function startDrag(e) {
+                    isDragging = true;
+                    easterEgg.textContent = '🌟';
+                    
+                    const rect = easterEgg.getBoundingClientRect();
+                    if (e.type === 'mousedown') {
+                        offsetX = e.clientX - rect.left;
+                        offsetY = e.clientY - rect.top;
+                    } else {
+                        offsetX = e.touches[0].clientX - rect.left;
+                        offsetY = e.touches[0].clientY - rect.top;
+                    }
+                    
+                    document.addEventListener('mousemove', onDrag);
+                    document.addEventListener('touchmove', onDrag);
+                    document.addEventListener('mouseup', stopDrag);
+                    document.addEventListener('touchend', stopDrag);
+                }
+                
+                function onDrag(e) {
+                    if (!isDragging) return;
+                    
+                    let clientX, clientY;
+                    if (e.type === 'mousemove') {
+                        clientX = e.clientX;
+                        clientY = e.clientY;
+                    } else {
+                        clientX = e.touches[0].clientX;
+                        clientY = e.touches[0].clientY;
+                    }
+                    
+                    // 限制在屏幕范围内
+                    const maxX = window.innerWidth - easterEgg.offsetWidth;
+                    const maxY = window.innerHeight - easterEgg.offsetHeight;
+                    
+                    let newX = clientX - offsetX;
+                    let newY = clientY - offsetY;
+                    
+                    newX = Math.max(0, Math.min(newX, maxX));
+                    newY = Math.max(0, Math.min(newY, maxY));
+                    
+                    easterEgg.style.left = newX + 'px';
+                    easterEgg.style.top = newY + 'px';
+                    
+                // 随机粒子效果
+                    if (Math.random() > 0.8) {
+                        createParticle(newX + 40, newY + 40);
+                    }
+                }
+                
+                function stopDrag() {
+                    isDragging = false;
+                    easterEgg.textContent = '✨';
+                    
+                    document.removeEventListener('mousemove', onDrag);
+                    document.removeEventListener('touchmove', onDrag);
+                    document.removeEventListener('mouseup', stopDrag);
+                    document.removeEventListener('touchend', stopDrag);
+                    
+                    // 如果靠近底部，自动吸附
+                    const rect = easterEgg.getBoundingClientRect();
+                    const navY = window.innerHeight - 200;
+                    
+                    if (rect.top > navY) {
+                        easterEgg.style.left = (window.innerWidth / 2 - 40) + 'px';
+                        easterEgg.style.top = (navY - 80) + 'px';
+                    }
+                }
+            }
+
+            // 双击检测
+            document.addEventListener('click', function() {
+                const currentTime = new Date().getTime();
+                if (currentTime - lastTapTime < 300) {
+                    closeEasterEgg();
+                    lastTapTime = 0;
+                } else {
+                    lastTapTime = currentTime;
+                }
+            });
+
+            function closeEasterEgg() {
+                if (isEasterEggActive) {
+                    easterEgg.style.transform = 'scale(0.5)';
+                    easterEgg.style.opacity = '0';
+                    
+                    setTimeout(() => {
+                        easterEgg.style.display = 'none';
+                        easterEgg.style.transform = '';
+                        easterEgg.style.opacity = '';
+                        isEasterEggActive = false;
+                        showMessage("彩蛋已关闭 ✨");
+                    }, 300);
+                }
+            }
+
+            // 粒子效果
+            function createParticle(x, y) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = x + 'px';
+                particle.style.top = y + 'px';
+                document.body.appendChild(particle);
+                
+                const angle = Math.random() * Math.PI * 2;
+                const distance = 20 + Math.random() * 30;
+                const targetX = x + Math.cos(angle) * distance;
+                const targetY = y + Math.sin(angle) * distance;
+                
+                particle.animate([
+                    { transform: 'translate(0, 0)', opacity: 1 },
+                    { transform: `translate(${targetX - x}px, ${targetY - y}px)`, opacity: 0 }
+                ], {
+                    duration: 800,
+                    easing: 'ease-out'
+                });
+                
+                setTimeout(() => {
+                    document.body.removeChild(particle);
+                }, 800);
+            }
+
+            // 显示消息
+            function showMessage(msg) {
+                // 在实际应用中可以使用Toast组件，这里简单使用alert
+                alert(msg);
+            }
+        });
+    </script>
+</body>
+</html>
